@@ -11,13 +11,13 @@ phases:
       - echo Starting build...
       - echo Login to Amazon ECR
       - $(aws ecr get-login --no-include-email --region $AWS_DEFAULT_REGION)
-      - REPO_URL=276704211106.dkr.ecr.eu-west-1.amazonaws.com/api
+      - REPO_URL=276704211106.dkr.ecr.eu-west-1.amazonaws.com/web
       - COMMIT_HASH=$(echo $CODEBUILD_RESOLVED_SOURCE_VERSION | cut -c 1-7)
       - IMAGE_TAG=build-$(echo $CODEBUILD_BUILD_NUMBER | awk -F":" '{print $2}')
   build:
     commands:
       - echo Building image `date`
-      - docker build -t $REPO_URL:latest ./words
+      - docker build -t $REPO_URL:latest ./web
       - echo Taging image with build number $CODEBUILD_BUILD_NUMBER
       - docker tag $REPO_URL:latest $REPO_URL:$COMMIT_HASH
   post_build:
@@ -27,7 +27,7 @@ phases:
       - docker push $REPO_URL:latest #<-- latest umjesto codebuild-numbera
       - docker push $REPO_URL:$COMMIT_HASH
       - echo Image pushed on `date`
-      - printf '[{"name":"api","imageUri":"%s"}]' $REPO_URL:$COMMIT_HASH > imageDetail.json
+      - printf '[{"name":"web","imageUri":"%s"}]' $REPO_URL:$COMMIT_HASH > imageDetail.json
       - cat imageDetail.json
       - echo Done
 # i ovo novo dole
